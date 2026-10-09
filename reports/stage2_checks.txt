@@ -1,0 +1,88 @@
+Rows inside modelling window: 171962
+
+======================================================================
+1. Which products have a usable weekly history?
+======================================================================
+Products: 96 | Weeks: 142 (2015-01-05 -> 2017-09-18)
+
+Products by maximum share of zero-sales weeks:
+  zero_share <= 0.05: 9
+  zero_share <= 0.10: 9
+  zero_share <= 0.20: 14
+  zero_share <= 0.30: 54
+  zero_share <= 0.50: 54
+
+ELIGIBLE (zero_share <= 0.20, sold in first 8 and last 8 weeks): 9
+Their share of all units in the window: 0.882
+Mean weekly units of eligible products (describe):
+count      9.00
+mean     256.61
+std      157.47
+min       95.57
+25%      120.55
+50%      221.06
+75%      402.72
+max      513.24
+
+======================================================================
+2. Chronological split (weeks)
+======================================================================
+{
+  "n_weeks": 142,
+  "train": [
+    "2015-01-05",
+    "2016-11-21",
+    99
+  ],
+  "validation": [
+    "2016-11-28",
+    "2017-04-17",
+    21
+  ],
+  "test": [
+    "2017-04-24",
+    "2017-09-18",
+    22
+  ]
+}
+
+======================================================================
+3. Is weekly demand predictable at all? (train + validation only)
+======================================================================
+TabPFN training rows estimate (eligible products x train weeks): 891
+
+Median lag-1 autocorrelation (train):  -0.033
+Median lag-52 autocorrelation (train): 0.003
+(near 0 = looks like random noise around a level; clearly positive = real structure)
+
+One-week-ahead MAE on the VALIDATION weeks (mean over products):
+  previous week      : 30.249
+  4-week moving avg  : 24.563
+  training-set mean  : 22.850
+(if the training mean is as good as the others, demand has no useful short-term pattern)
+
+======================================================================
+4. Cost target: is it just a formula?
+======================================================================
+unit_cost == price*(1-discount_rate)*(1-profit_ratio) (rtol 2%): 1.0000
+Discount / Sales == Discount Rate (within 0.006): 1.0000
+
+Share of variance explained by group averages alone (in-sample R2):
+  unit_cost  by Product Card Id : 0.601
+  cost_ratio by Product Card Id : 0.000
+  cost_ratio by Category Id      : 0.000
+  cost_ratio by Shipping Mode    : 0.000
+  cost_ratio by Market           : 0.000
+  cost_ratio by Customer Segment : 0.000
+  cost_ratio by Type             : 0.000
+  cost_ratio by Order Region     : 0.000
+
+cost_ratio describe:
+count    171962.000
+mean          0.879
+std           0.467
+min           0.500
+25%           0.640
+50%           0.730
+75%           0.920
+max           3.750
