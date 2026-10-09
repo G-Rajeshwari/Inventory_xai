@@ -1,0 +1,63 @@
+Shape (rows, columns): (180519, 53)
+
+Column summary:
+                                 dtype  missing  missing_pct  n_unique
+Type                               str        0         0.00         4
+Days for shipping (real)         int64        0         0.00         7
+Days for shipment (scheduled)    int64        0         0.00         4
+Benefit per order              float64        0         0.00     21998
+Sales per customer             float64        0         0.00      2927
+Delivery Status                    str        0         0.00         4
+Late_delivery_risk               int64        0         0.00         2
+Category Id                      int64        0         0.00        51
+Category Name                      str        0         0.00        50
+Customer City                      str        0         0.00       563
+Customer Country                   str        0         0.00         2
+Customer Email                     str        0         0.00         1
+Customer Fname                     str        0         0.00       782
+Customer Id                      int64        0         0.00     20652
+Customer Lname                     str        8         0.00      1109
+Customer Password                  str        0         0.00         1
+Customer Segment                   str        0         0.00         3
+Customer State                     str        0         0.00        46
+Customer Street                    str        0         0.00      7458
+Customer Zipcode               float64        3         0.00       995
+Department Id                    int64        0         0.00        11
+Department Name                    str        0         0.00        11
+Latitude                       float64        0         0.00     11250
+Longitude                      float64        0         0.00      4487
+Market                             str        0         0.00         5
+Order City                         str        0         0.00      3597
+Order Country                      str        0         0.00       164
+Order Customer Id                int64        0         0.00     20652
+order date (DateOrders)            str        0         0.00     65752
+Order Id                         int64        0         0.00     65752
+Order Item Cardprod Id           int64        0         0.00       118
+Order Item Discount            float64        0         0.00      1017
+Order Item Discount Rate       float64        0         0.00        18
+Order Item Id                    int64        0         0.00    180519
+Order Item Product Price       float64        0         0.00        75
+Order Item Profit Ratio        float64        0         0.00       162
+Order Item Quantity              int64        0         0.00         5
+Sales                          float64        0         0.00       193
+Order Item Total               float64        0         0.00      2927
+Order Profit Per Order         float64        0         0.00     21998
+Order Region                       str        0         0.00        23
+Order State                        str        0         0.00      1089
+Order Status                       str        0         0.00         9
+Order Zipcode                  float64   155679        86.24       609
+Product Card Id                  int64        0         0.00       118
+Product Category Id              int64        0         0.00        51
+Product Description            float64   180519       100.00         0
+Product Image                      str        0         0.00       118
+Product Name                       str        0         0.00       118
+Product Price                  float64        0         0.00        75
+Product Status                   int64        0         0.00         1
+shipping date (DateOrders)         str        0         0.00     63701
+Shipping Mode                      str        0         0.00         4
+
+Exact duplicate rows: 0
+
+Date-like columns: ['order date (DateOrders)', 'shipping date (DateOrders)']
+order date (DateOrders): 2015-01-01 00:00:00 -> 2018-01-31 23:38:00 (unparseable: 0)
+shipping date (DateOrders): 2015-01-03 00:00:00 -> 2018-02-06 22:14:00 (unparseable: 0)

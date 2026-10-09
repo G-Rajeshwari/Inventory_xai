@@ -1,0 +1,176 @@
+
+======================================================================
+1. Key numeric columns
+======================================================================
+                                  count    mean     std      min     25%     50%     75%      max
+Order Item Quantity            180519.0    2.13    1.45     1.00    1.00    1.00    3.00     5.00
+Sales                          180519.0  203.77  132.27     9.99  119.98  199.92  299.95  1999.99
+Order Item Product Price       180519.0  141.23  139.73     9.99   50.00   59.99  199.99  1999.99
+Order Item Discount            180519.0   20.66   21.80     0.00    5.40   14.00   29.99   500.00
+Order Item Total               180519.0  183.11  120.04     7.49  104.38  163.99  247.40  1939.99
+Order Profit Per Order         180519.0   21.97  104.43 -4274.98    7.00   31.52   64.80   911.80
+Order Item Profit Ratio        180519.0    0.12    0.47    -2.75    0.08    0.27    0.36     0.50
+Days for shipping (real)       180519.0    3.50    1.62     0.00    2.00    3.00    5.00     6.00
+Days for shipment (scheduled)  180519.0    2.93    1.37     0.00    2.00    4.00    4.00     4.00
+
+Negative values (negative profit can be legitimate, a loss):
+  Order Item Quantity: 0
+  Sales: 0
+  Order Item Product Price: 0
+  Order Item Discount: 0
+  Order Item Total: 0
+  Order Profit Per Order: 33784
+  Order Item Profit Ratio: 33784
+  Days for shipping (real): 0
+  Days for shipment (scheduled): 0
+
+======================================================================
+2. Relationships between columns (share of rows that match)
+======================================================================
+Sales == price * quantity            : 1.0000
+Order Item Total == Sales - discount : 0.9932
+Benefit per order == Order Profit    : 1.0000
+Sales per customer == Order Item Total: 1.0000
+Profit == Total * Profit Ratio       : 0.6378
+Category Id == Product Category Id   : 1.0000
+
+Implied cost = Order Item Total - Order Profit Per Order (hypothesis only):
+count    180519.00
+mean        161.13
+std         148.22
+min           4.09
+25%          75.07
+50%         124.79
+75%         202.47
+max        6174.97
+Implied cost <= 0 rows: 0
+
+======================================================================
+3. Categorical value counts
+======================================================================
+
+Order Status:
+Order Status
+COMPLETE           59491
+PENDING_PAYMENT    39832
+PROCESSING         21902
+PENDING            20227
+CLOSED             19616
+ON_HOLD             9804
+SUSPECTED_FRAUD     4062
+CANCELED            3692
+PAYMENT_REVIEW      1893
+
+Delivery Status:
+Delivery Status
+Late delivery        98977
+Advance shipping     41592
+Shipping on time     32196
+Shipping canceled     7754
+
+Shipping Mode:
+Shipping Mode
+Standard Class    107752
+Second Class       35216
+First Class        27814
+Same Day            9737
+
+Type:
+Type
+DEBIT       69295
+TRANSFER    49883
+PAYMENT     41725
+CASH        19616
+
+Market:
+Market
+LATAM           51594
+Europe          50252
+Pacific Asia    41260
+USCA            25799
+Africa          11614
+
+Customer Segment:
+Customer Segment
+Consumer       93504
+Corporate      54789
+Home Office    32226
+
+======================================================================
+4. Time-series feasibility (weekly units per product)
+======================================================================
+Monthly total units:
+order_dt
+2015-01    11854
+2015-02    10438
+2015-03    12062
+2015-04    11287
+2015-05    11902
+2015-06    11203
+2015-07    11800
+2015-08    11612
+2015-09    11366
+2015-10    11703
+2015-11    11463
+2015-12    11790
+2016-01    11597
+2016-02    10765
+2016-03    11349
+2016-04    11208
+2016-05    11603
+2016-06    11008
+2016-07    11652
+2016-08    11683
+2016-09    11284
+2016-10    11936
+2016-11    11493
+2016-12    11774
+2017-01    11605
+2017-02    11070
+2017-03    11676
+2017-04    11189
+2017-05    11033
+2017-06    10194
+2017-07    11091
+2017-08    11095
+2017-09    10502
+2017-10     2490
+2017-11     2055
+2017-12     2124
+2018-01     2123
+Freq: M
+
+Products: 118  |  Weeks: 162
+Share of product-weeks with zero sales: 0.633
+
+Active weeks per product (describe):
+count    118.0
+mean      59.5
+std       53.4
+min        1.0
+25%        4.2
+50%       21.0
+75%      111.0
+max      145.0
+
+Products with no sales in the last 8 weeks: 100
+
+Total weekly units (describe):
+count     162.0
+mean     2370.9
+std       688.0
+min       205.0
+25%      2506.2
+50%      2609.5
+75%      2684.2
+max      2906.0
+
+======================================================================
+5. Delivery time by shipping mode
+======================================================================
+                Days for shipping (real)  Days for shipment (scheduled)  share_late_vs_schedule
+Shipping Mode                                                                                  
+First Class                         2.00                            1.0                   1.000
+Same Day                            0.48                            0.0                   0.478
+Second Class                        3.99                            2.0                   0.797
+Standard Class                      4.00                            4.0                   0.398
