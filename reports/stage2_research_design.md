@@ -96,3 +96,42 @@ data. Explanations describe the model, NOT causes in the real world.
 - Lead time is delivery time to customers, not supplier replenishment time.
 - Single company, 2015 to 2017; regime change after Sept 2017 excluded.
 - Cost target is derived from profit, not observed.
+
+## 13. Findings from feasibility checks (Stage 2)
+
+Evidence (all from train/validation weeks only, produced by src/stage2_checks.py):
+- 96 products sold in the 142 full weeks; 14 had <= 20% zero-sales weeks.
+- Median lag-1 autocorrelation -0.033 and lag-52 autocorrelation 0.003 over 9
+  dense products (99 training weeks).
+- Validation one-week-ahead MAE: training mean 22.85, 4-week average 24.56,
+  previous week 30.25. These ratios are close to what noise around a constant
+  level would produce. This is evidence, not proof (9 products, 21 weeks,
+  lags 1 and 52 only).
+- Unit cost equals price*(1-discount rate)*(1-profit ratio) in 100% of rows.
+- Cost ratio (1 - profit ratio) is not explained by product, category,
+  shipping mode, market, segment, payment type or region (R2 = 0.000 each).
+
+Design updates:
+1. Product eligibility is defined from TRAINING weeks only (low zero-week share
+   and a sale in the last 8 training weeks). The earlier rule used the full
+   window and leaked test-period information. Final thresholds: [after
+   stage2_eligibility.py].
+2. Baselines: training mean, 26-week moving average, 4-week moving average,
+   previous week. The training mean is the main baseline to beat.
+3. Paired bootstrap resamples weeks (not products); the product count is small.
+4. Cost model target is the cost ratio, compared with a product-mean baseline.
+   Dollar unit cost = net price x predicted ratio. Unit-cost accuracy driven by
+   price and discount arithmetic is NOT reported as model skill.
+5. Late-delivery risk uses empirical late rates by shipping mode (no ML model).
+6. The test set is evaluated once, after all choices are frozen. Products that
+   stop selling during the test period are reported in the error analysis.
+
+Expected outcome (stated before running experiments): TabPFN may not beat the
+training-mean baseline, and the cost ratio may not be predictable. These would
+be reported as negative results.
+
+Added threats to validity:
+- The product catalog changes between April and September 2017, inside the
+  test window.
+- Demand and cost-ratio patterns resemble randomly assigned values; the data
+  origin is unknown.
