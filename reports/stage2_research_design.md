@@ -135,3 +135,18 @@ Added threats to validity:
   test window.
 - Demand and cost-ratio patterns resemble randomly assigned values; the data
   origin is unknown.
+
+## 14. Final product selection (Stage 2, frozen)
+
+- Eligibility (training weeks only): zero-sales share <= 0.20 and at least one
+  sale in the last 8 training weeks. Result: 54 products (the original catalog).
+- No eligible product was silent in the last 8 validation weeks.
+- Tiers by mean training units per week: Tier A (>= 50) and Tier B (< 50).
+  Counts and statistics: reports/eligible_products.csv.
+- Metrics are reported per tier AND pooled, because a handful of high-volume
+  products dominate pooled absolute errors. Scaled metrics (WAPE, MASE against
+  the training mean) are used to compare tiers.
+- Thresholds are frozen. Aggregate full-window statistics were seen before the
+  thresholds were set, so no further tuning of selection rules is allowed.
+- Rows for TabPFN: 54 products x training weeks, before lag features
+  (about 5,300 rows), within current TabPFN size guidance.
