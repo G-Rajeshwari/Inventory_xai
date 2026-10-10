@@ -26,10 +26,12 @@ def make_model(name: str, seed: int):
     raise ValueError(f"Unknown model: {name}. Choose from {MODEL_NAMES}.")
 
 
-def fit_predict(name: str, seed: int, train: pd.DataFrame, evaluate: pd.DataFrame, factory=None) -> np.ndarray:
-    """Fit on `train`, predict `evaluate`. `factory` lets tests inject a fast fake model."""
+def fit_predict(name: str, seed: int, train: pd.DataFrame, evaluate: pd.DataFrame,
+                factory=None, feature_cols=None) -> np.ndarray:
+    """Fit on `train`, predict `evaluate`. `factory` lets tests inject a fast fake model.
+    `feature_cols` selects a feature subset (ablation); default is all features."""
     model = (factory or make_model)(name, seed)
-    cols = list(FEATURE_COLS)
+    cols = list(feature_cols or FEATURE_COLS)
     model.fit(train[cols].to_numpy(dtype=float), train["units"].to_numpy(dtype=float))
     pred = np.asarray(model.predict(evaluate[cols].to_numpy(dtype=float)), dtype=float)
     return np.clip(pred, 0, None)

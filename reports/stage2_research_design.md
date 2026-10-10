@@ -172,3 +172,28 @@ Decision rules, fixed BEFORE any machine-learning model is run:
 3. Hyperparameters: library defaults first. Any tuning (small fixed grid or
    Optuna) uses train -> validation only, and the number of trials is logged.
 4. The test set is evaluated once, after rules 1 to 3 have been applied.
+
+## 16. Stage 6 outcome on VALIDATION weeks (library defaults, no tuning)
+
+Software: tabpfn 9.1.0, weights tabpfn-v3.5-20260909 (non-commercial license
+accepted by the author), local CPU inference. Models trained on 3,942 rows with
+10 features, evaluated on 1,134 validation rows. Predictions clipped at zero.
+
+Pooled MAE relative to the training mean (95% paired week-bootstrap interval of
+the MAE difference in brackets):
+- Random Forest (5 seeds): +2.8% [-0.06, +0.49] (no detectable difference)
+- XGBoost (defaults; seed has no effect, so effectively 1 run): +12.7% [+0.48, +1.33]
+- TabPFN (5 seeds): +13.1% [+0.58, +1.32]
+Tier A (9 high-volume products): TabPFN +25.1% [+3.45, +8.03]; XGBoost +16.1%;
+Random Forest +3.6% (not distinguishable). Tier B (45 products): TabPFN -0.3%
+[-0.05, +0.03] (not distinguishable).
+
+Decision rule 1 (95% interval entirely below zero) is NOT met by any model.
+Rule 2 therefore applies: the RQ1 conclusion is "no improvement over a
+per-product training mean detected on this data", and the training mean is the
+demand forecast used by the optimizer, with TabPFN as a sensitivity comparison.
+
+Limits of this conclusion: one dataset; 21 validation weeks; default settings;
+a single feature set. These results say nothing about TabPFN in general.
+The feature ablation (Section 17) tests whether the history features cause the
+extra error.
