@@ -150,3 +150,25 @@ Added threats to validity:
   thresholds were set, so no further tuning of selection rules is allowed.
 - Rows for TabPFN: 54 products x training weeks, before lag features
   (about 5,300 rows), within current TabPFN size guidance.
+
+  ## 15. Stage 5 baseline results and pre-specified decision rules
+
+Observed on VALIDATION weeks (reports/baseline_validation.csv): the training mean
+has the lowest MAE in every group. Relative to it, MAE is +1.6% (MA-26), +8.3%
+(MA-4) and +35.1% (last week) pooled. RMSE ratios to the training mean are close
+to 1.41, 1.12 and 1.02 (last week, MA-4, MA-26), which is what random scatter
+around a fixed level would produce. This is evidence from 21 weeks, not proof.
+
+R2 is not used to judge skill: pooled and Tier A R2 are inflated by volume
+differences between products, and Tier B R2 is about zero.
+
+Decision rules, fixed BEFORE any machine-learning model is run:
+1. A model "improves on the baseline" only if the 95% paired week-bootstrap
+   interval of (model MAE - training-mean MAE) on VALIDATION weeks lies entirely
+   below zero for the pooled data. Tiers are reported separately.
+2. If no model meets rule 1, the RQ1 conclusion is "no improvement detected on
+   this data". The training mean is then the demand forecast used by the
+   optimizer, with TabPFN as a sensitivity comparison.
+3. Hyperparameters: library defaults first. Any tuning (small fixed grid or
+   Optuna) uses train -> validation only, and the number of trials is logged.
+4. The test set is evaluated once, after rules 1 to 3 have been applied.
