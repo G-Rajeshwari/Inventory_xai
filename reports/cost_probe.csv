@@ -1,0 +1,13 @@
+column,oos_skill_vs_constant,n_groups
+discount_rate,0.000151,18
+sched_days,1.5e-05,4
+shipping_mode,1.5e-05,4
+qty,-2e-05,5
+market,-2.1e-05,5
+department,-3.5e-05,6
+pay_type,-6.3e-05,4
+category_id,-0.000149,25
+segment,-0.000156,3
+price,-0.000178,29
+region,-0.000264,23
+product_id,-0.000353,54
