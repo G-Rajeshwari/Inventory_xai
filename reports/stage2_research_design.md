@@ -208,10 +208,14 @@ Findings:
    comes from additional features.
 2. Adding week of year to the product code raises Random Forest's pooled MAE by
    12.7% (interval above zero), consistent with no detectable seasonality.
-3. TabPFN with numeric product code does not reproduce the training mean even with
-   product code only (+14.6% pooled, interval above zero), and is indistinguishable
-   from TabPFN with all features. History features are therefore not the cause of
-   its extra error. No variant matches the training mean pooled.
+3. TabPFN (numeric product code): no variant matches the training mean pooled
+   (+10.1% to +14.6%, all intervals above zero). With product code only it is
+   +14.6% pooled, indistinguishable from all features. history_only (+11.0%) and
+   id_season (+10.1%) are better than full (+14.1%), with intervals excluding zero
+   (differences -0.23 and -0.30 MAE), so the pattern across feature sets is not
+   monotonic and is unexplained; with 3 seeds and many comparisons it should not be
+   over-interpreted. The history features are not the sole cause of the extra error,
+   because id_only is as poor as full.
 4. Possible explanation (UNTESTED when written): the integer product code is read as
    an ordered number, which may blur unrelated products. Tested in Section 18.
 Caveats: many intervals are reported from 21 validation weeks; differences of a few
@@ -220,3 +224,27 @@ hundredths between variants are within noise.
 Pre-registration note: variants in this section and in Section 18 were chosen after
 seeing the validation results in Section 16. They are exploratory. The
 pre-specified comparison remains the one in Section 16.
+
+## 18. Stage 6c: TabPFN with categorical product code (EXPLORATORY, VALIDATION weeks)
+
+Variants: product_code declared categorical (categorical_features_indices), with all
+features and with product code only; 3 seeds; compared with numeric-code TabPFN.
+Pooled MAE vs training mean (95% interval of the MAE difference):
+- categorical, full: +12.9% [+0.57, +1.30]; categorical, id_only: +13.5% [+0.55, +1.40]
+- numeric, full: +14.1% [+0.64, +1.41]; numeric, id_only: +14.6% [+0.60, +1.51]
+Tier A: +24.6% / +25.3% (categorical) vs +27.1% / +27.4% (numeric), all intervals above
+zero. Tier B: all within 0.3% of the training mean, intervals include zero.
+Switching to a categorical encoding changes pooled MAE by at most 0.09, comparable to
+seed-to-seed spread (0.08 to 0.15). The encoding explanation is not supported.
+
+Status: why TabPFN is worse than the per-product mean in Tier A is UNRESOLVED.
+Untested ideas: very different scales of Tier A and Tier B products in one model;
+smoothing across products. Exploration of TabPFN variants stops here to avoid post-hoc
+searching. This is reported as a limitation.
+
+FROZEN for the final test run (Stage 11, evaluated once; models refit on
+train + validation): training mean, MA-26, MA-4, last week, Random Forest (5 seeds),
+XGBoost (1 run; defaults ignore the seed), TabPFN (numeric product code, all features,
+library defaults, 5 seeds). tabpfn_cat may be reported as exploratory. Variants from
+Sections 17 and 18 were chosen after seeing validation results and are not part of the
+pre-specified comparison.
