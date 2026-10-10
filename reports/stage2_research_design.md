@@ -197,3 +197,26 @@ Limits of this conclusion: one dataset; 21 validation weeks; default settings;
 a single feature set. These results say nothing about TabPFN in general.
 The feature ablation (Section 17) tests whether the history features cause the
 extra error.
+
+## 17. Stage 6b ablation (VALIDATION weeks, library defaults)
+
+Variants: full (10 features), history_only (no week of year), id_season (product
+code + week of year), id_only (product code only).
+Findings:
+1. Random Forest and XGBoost with id_only reproduce the training mean (pooled MAE
+   7.294 / 7.297 vs 7.297). Trees can learn each product's level; any extra error
+   comes from additional features.
+2. Adding week of year to the product code raises Random Forest's pooled MAE by
+   12.7% (interval above zero), consistent with no detectable seasonality.
+3. TabPFN with numeric product code does not reproduce the training mean even with
+   product code only (+14.6% pooled, interval above zero), and is indistinguishable
+   from TabPFN with all features. History features are therefore not the cause of
+   its extra error. No variant matches the training mean pooled.
+4. Possible explanation (UNTESTED when written): the integer product code is read as
+   an ordered number, which may blur unrelated products. Tested in Section 18.
+Caveats: many intervals are reported from 21 validation weeks; differences of a few
+hundredths between variants are within noise.
+
+Pre-registration note: variants in this section and in Section 18 were chosen after
+seeing the validation results in Section 16. They are exploratory. The
+pre-specified comparison remains the one in Section 16.

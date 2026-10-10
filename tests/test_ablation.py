@@ -59,4 +59,3 @@ def test_vs_full_is_zero_for_identical_predictions_and_detects_improvement():
     t = run_ablation.vs_full_table(val, preds, n_boot=300).set_index(["group", "model"])
     assert abs(t.loc[("pooled", "m[same]"), "diff_vs_full"]) < 1e-12
     assert t.loc[("pooled", "m[oracle]"), "full_ci_high"] < 0
-EOF

@@ -85,7 +85,7 @@ def evaluate(val: pd.DataFrame, model_preds: dict, n_boot: int = 2000) -> pd.Dat
                 "MAE_vs_train_mean": np.mean(mae_seeds) / ref_mae,
                 "diff_vs_train_mean": boot["mean_diff"],
                 "ci_low": boot["ci_low"], "ci_high": boot["ci_high"],
-                "beats_train_mean": bool(boot["ci_high"] < 0),
+                "beats_train_mean": bool(boot["ci_high"] < -1e-6),   # tolerance: ignore float rounding
                 "n_rows": int(mask.sum()),
             })
     return pd.DataFrame(rows)
