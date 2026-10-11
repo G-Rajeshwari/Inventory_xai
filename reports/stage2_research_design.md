@@ -248,3 +248,30 @@ XGBoost (1 run; defaults ignore the seed), TabPFN (numeric product code, all fea
 library defaults, 5 seeds). tabpfn_cat may be reported as exploratory. Variants from
 Sections 17 and 18 were chosen after seeing validation results and are not part of the
 pre-specified comparison.
+
+## 19. Stage 7a: cost-ratio probe and pre-specified decision rules for cost models
+
+Probe (reports/cost_probe.csv; TRAIN lines fit, VALIDATION lines scored; 118,705 train
+and 25,246 validation order lines of the 54 eligible products): single-column group-mean
+predictors of cost_ratio (1 - Order Item Profit Ratio) have out-of-sample skill between
+-0.00035 and +0.00015 versus a constant. Correlations with the numeric inputs are
+between +0.0002 and +0.0032. Mean cost ratio by discount rate ranges from 0.871 to
+0.892, consistent with sampling noise. cost_ratio is DERIVED from profit data, not an
+observed supply-chain cost.
+
+Decision rules, fixed BEFORE any cost model is trained:
+1. Reference: the global training mean of cost_ratio. Baselines: global mean,
+   per-product training mean. Models: CatBoost (native categoricals), Random Forest,
+   XGBoost, all library defaults; seeds 0-2 for CatBoost and Random Forest, one run for
+   XGBoost. Predictions are clipped to the training range of cost_ratio.
+2. Primary metric: mean squared error (the optimizer needs an expected cost, i.e. a
+   mean). MAE, RMSE and skill (1 - MSE/MSE_reference) are reported too.
+3. A model "improves on the reference" only if (a) the 95% paired week-bootstrap
+   interval of (MSE_model - MSE_reference) on VALIDATION lines is entirely below zero AND
+   (b) the MSE reduction is at least 0.5%.
+4. Dollar unit cost = list price x (1 - discount rate) x cost ratio is reported next to
+   the arithmetic baseline (price x (1 - discount) x global mean ratio). Dollar-level
+   accuracy is NOT claimed as model skill; only the ratio comparison counts.
+5. If no model meets rule 3, the optimizer uses the global mean cost ratio (or the
+   per-product mean) as its expected cost ratio, and CatBoost is a sensitivity
+   comparison. The test set is evaluated once, in Stage 11, with the same models.
