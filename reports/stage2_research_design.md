@@ -360,3 +360,25 @@ Stage 11 plan: re-optimise on train + validation weeks, evaluate once on the tes
   code, tier flag, rolling means) are expected to rank high because shuffling them destroys
   the level information; this does not mean they predict week-to-week variation. Because no
   model beat the training mean, importance largely describes reliance on level and noise.
+
+  ## 24. Stage 8a outcome (permutation importance, VALIDATION rows) and within-product scheme
+
+Cost ratio (MSE-based): no feature is above the noise control for CatBoost or XGBoost.
+CatBoost product_id and category_id have intervals just above zero (+0.00015) but not above
+the noise upper bound (+0.00016); all importances are about 0.1% of the model MSE (0.217).
+Consistent with Stage 7a: the cost ratio shows no detectable dependence on any input.
+Demand (MAE-based, shuffling across all rows): in both Random Forest and XGBoost all lag and
+rolling-mean features, the tier flag and (for XGBoost and Random Forest) product code are
+above noise; week_of_year and the noise column are not. Because shuffling across all rows
+mixes products of very different volume, this scheme mostly measures reliance on the
+product LEVEL (e.g. Random Forest roll_mean_13: +19.5 MAE against a model MAE of 7.5).
+It does not show that any feature predicts week-to-week variation.
+
+Added scheme, rule fixed BEFORE running: permutation WITHIN each product (values shuffled
+only among rows of the same product; product level preserved). Same models, repeats,
+bootstrap and above-noise rule. product_code and is_tier_a are constant within a product,
+so their within-product importance is zero by construction.
+Expectation stated beforehand: if features carry only level information, no feature will be
+above noise within product; an above-noise lag or rolling-mean feature would indicate some
+within-product signal that the models use (not necessarily beneficially, since no model beat
+the training mean).
