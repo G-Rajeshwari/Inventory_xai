@@ -314,3 +314,33 @@ Decision rules fixed before the run on real data:
 3. Realised fill rate on the evaluation weeks is reported next to the 95% planning
    requirement; falling below it is reported, not hidden.
 4. All results are labelled simulation. No real cost saving is claimed.
+
+## 22. Stage 7b outcome on VALIDATION weeks (SIMULATION under assumed costs)
+
+Inputs (training weeks): global mean cost ratio 0.8801; lead times (days/7): Standard 0.571,
+Second 0.571, First 0.286, Same Day 0.065 weeks; late rates 0.398, 0.800, 1.000, 0.453.
+Base plan (54 products): all Standard Class; review cycles R=1: 13, R=2: 27, R=4: 14
+products; inventory investment 143,909 vs budget 143,910 (budget binding); capacity
+constraints not binding.
+Weekly cost, validation (21 weeks): optimizer 6,285.9; B1 6,474.2; B2 6,953.8.
+Optimizer - B1: -188.3 [-655.9, +334.2]; optimizer - B2: -667.9 [-1303.5, +77.3].
+In-sample (training weeks) the optimizer was 6,020.0 vs 6,429.3 for B1 (-6.4%); out of
+sample the gain shrank to -2.9% (about half).
+Components ($/week, validation), optimizer vs B1: ordering 708 vs 1,195; holding 706 vs
+705; shipping 3,560 vs 3,568; stockout 1,086 vs 626; late 226 vs 381. Savings come from
+ordering less often at the cost of more stockouts and depend on the assumed ordering cost
+and late penalty.
+Realised fill rate (validation, pooled): optimizer 99.2%, B1 99.6%, B2 98.8% (requirement
+95%). Per-product realised fill was not computed.
+Decision rule 1: NOT met (both intervals include zero).
+Rule 2: point estimates favour the optimizer in 12/12 scenarios vs both baselines. Interval
+below zero: vs B1 in 1 of 11 non-base scenarios (budget +20%, which gives the optimizer 20%
+more inventory than B1, so not an equal-budget comparison); vs B2 in 7 of 11 (6 of 10
+without the budget scenario). B2 holds about 22% more inventory than B1.
+Mode choice: Standard Class for all 54 products in all 12 scenarios; Second Class is
+dominated (same lead time, higher late rate and cost). Mode and capacity decisions are
+trivial under the assumed shipping surcharges.
+RQ2 conclusion: under these assumptions no lower simulated cost than the baselines was
+detected in the base scenario; the direction is consistently favourable. No real saving is
+claimed.
+Stage 11 plan: re-optimise on train + validation weeks, evaluate once on the test weeks.
