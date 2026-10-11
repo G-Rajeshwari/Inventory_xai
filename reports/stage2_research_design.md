@@ -275,3 +275,15 @@ Decision rules, fixed BEFORE any cost model is trained:
 5. If no model meets rule 3, the optimizer uses the global mean cost ratio (or the
    per-product mean) as its expected cost ratio, and CatBoost is a sensitivity
    comparison. The test set is evaluated once, in Stage 11, with the same models.
+
+## 20. Stage 7a outcome: cost-ratio models on VALIDATION lines
+
+Reference: global training mean of cost_ratio (about 0.88). MSE relative to it (95% paired
+week-bootstrap interval of the MSE difference in brackets), library defaults:
+- per-product mean 1.0004 [0.0000, +0.00016]; CatBoost (3 seeds) 1.0009 [-0.00001, +0.00040]
+- XGBoost 1.0197 [+0.0033, +0.0053]; Random Forest (3 seeds) 1.2217 [+0.045, +0.052]
+Rule 3 is not met by any model. Rule 5 applies: the optimizer uses the global training mean
+cost ratio; CatBoost is a sensitivity comparison. Dollar-level R2 of the arithmetic baseline
+(net price x constant ratio) is 0.613, so dollar accuracy is not evidence of model skill.
+Limits: cost_ratio is derived from profit data, not an observed cost; defaults only (Random
+Forest was not regularised); validation lines only (test evaluated once in Stage 11).
