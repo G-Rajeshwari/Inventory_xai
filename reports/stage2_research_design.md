@@ -287,3 +287,30 @@ cost ratio; CatBoost is a sensitivity comparison. Dollar-level R2 of the arithme
 (net price x constant ratio) is 0.613, so dollar accuracy is not evidence of model skill.
 Limits: cost_ratio is derived from profit data, not an observed cost; defaults only (Random
 Forest was not regularised); validation lines only (test evaluated once in Stage 11).
+
+## 21. Stage 7b: optimizer design and pre-specified decision rules (SIMULATION)
+
+All cost parameters are assumptions in src/assumptions.py; none is observed in the data.
+Derived inputs (training weeks only): unit cost = list price x (1 - mean discount) x
+global mean cost ratio; lead time per mode = mean real shipping days / 7 (customer
+delivery days reused as replenishment lead time); late rate per mode = share of lines
+with real > scheduled days; demand mean and std per product.
+Decision variables per product: shipping mode, review cycle R in {1, 2, 4} weeks,
+order-up-to level S. Order-up-to levels are searched on training weeks; one
+(mode, R, S) per product is chosen by a MILP (SciPy/HiGHS) minimising total weekly cost
+subject to fill rate >= 95% (training weeks), inventory investment <= that of baseline
+B1, and mode capacity limits. Purchase cost of units sold is excluded (same for all
+policies). Lost sales; initial stock = S.
+Baselines: B1 = weekly review, Standard Class, S = mu(1+L) + 1.645 sigma sqrt(1+L);
+B2 = weekly review, Standard Class, S = 2 mu.
+Evaluation: validation weeks first with actual demand; test weeks once in Stage 11.
+
+Decision rules fixed before the run on real data:
+1. RQ2 is answered "lower simulated cost" against a baseline only if the 95% paired
+   week-bootstrap interval of (optimizer - baseline) weekly cost on VALIDATION weeks lies
+   entirely below zero in the base scenario.
+2. Robustness: report in how many of the 10 one-at-a-time cost scalings (x0.5, x2) and
+   the +20% budget scenario the interval stays below zero.
+3. Realised fill rate on the evaluation weeks is reported next to the 95% planning
+   requirement; falling below it is reported, not hidden.
+4. All results are labelled simulation. No real cost saving is claimed.
