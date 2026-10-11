@@ -344,3 +344,19 @@ RQ2 conclusion: under these assumptions no lower simulated cost than the baselin
 detected in the base scenario; the direction is consistently favourable. No real saving is
 claimed.
 Stage 11 plan: re-optimise on train + validation weeks, evaluate once on the test weeks.
+
+## 23. Stage 8a: permutation-importance rules (fixed before running)
+
+- Models: Random Forest and XGBoost (demand), CatBoost and XGBoost (cost ratio); library
+  defaults, seed 0, retrained with an added independent N(0,1) noise column. TabPFN is
+  excluded (about 3 minutes per validation pass; permutation importance needs hundreds).
+- Importance = mean increase in per-row loss (MAE for demand, MSE for cost) on VALIDATION
+  rows when one column is shuffled; 20 repeats (demand) / 5 repeats (cost); 95% paired
+  week-bootstrap interval.
+- A feature is reported as "above noise" only if its interval lower bound exceeds
+  max(0, upper bound of the noise feature).
+- Importance describes reliance of the model, not causation. Correlated features (lags,
+  rolling means) share importance. Features that encode a product's volume level (product
+  code, tier flag, rolling means) are expected to rank high because shuffling them destroys
+  the level information; this does not mean they predict week-to-week variation. Because no
+  model beat the training mean, importance largely describes reliance on level and noise.
