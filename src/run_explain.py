@@ -6,6 +6,7 @@ Cost models: CatBoost and XGBoost on order lines.
 Models are retrained with the extra noise column (seed 0, library defaults).
 
 Run:  python -m src.run_explain --task demand
+      python -m src.run_explain --task demand --within-product
       python -m src.run_explain --task cost
 """
 import argparse
@@ -20,7 +21,7 @@ SEED = 0
 EVAL = "validation"
 
 
-def demand_importance(feat, name, seed=SEED, n_repeats=20, n_boot=1000, factory=None):
+def demand_importance(feat, name, seed=SEED, n_repeats=20, n_boot=1000, factory=None, within_product=False):
     tr = explain.add_noise(feat[feat["split"] == "train"], 10_000 + seed)
     va = explain.add_noise(feat[feat["split"] == EVAL], 20_000 + seed)
     cols = list(FEATURE_COLS) + [explain.NOISE]
@@ -30,10 +31,13 @@ def demand_importance(feat, name, seed=SEED, n_repeats=20, n_boot=1000, factory=
     def predict(X):
         return np.clip(np.asarray(model.predict(X[cols].to_numpy(dtype=float)), dtype=float), 0, None)
 
+    groups = va["product_id"].to_numpy() if within_product else None
     imp = explain.permutation_importance(predict, va[cols], va["units"].to_numpy(), va["week"].to_numpy(),
-                                         explain.abs_loss, n_repeats=n_repeats, n_boot=n_boot, seed=seed)
+                                         explain.abs_loss, n_repeats=n_repeats, n_boot=n_boot, seed=seed,
+                                         groups=groups)
     imp = explain.flag_informative(imp)
     imp["task"], imp["model"], imp["loss"] = "demand", name, "MAE"
+    imp["scheme"] = "within_product" if within_product else "global"
     imp["model_val_MAE_with_noise_col"] = imp["base_loss"]
     return imp
 
@@ -97,6 +101,7 @@ def show(imp):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--task", choices=["demand", "cost"], required=True)
+    ap.add_argument("--within-product", action="store_true", help="demand only: shuffle within each product")
     args = ap.parse_args()
     config.REPORTS.mkdir(exist_ok=True)
 
@@ -105,13 +110,16 @@ def main():
         feat = feat.sort_values(["product_id", "week"]).reset_index(drop=True)
         outs = []
         for name in ("random_forest", "xgboost"):
-            imp = demand_importance(feat, name)
-            print(f"\n{name}: permutation importance on VALIDATION rows, loss = MAE "
+            imp = demand_importance(feat, name, within_product=args.within_product)
+            scheme = "WITHIN each product" if args.within_product else "across all rows"
+            print(f"\n{name}: permutation importance ({scheme}) on VALIDATION rows, loss = MAE "
                   f"(model MAE incl. noise column = {imp['base_loss'].iloc[0]:.3f})")
             show(imp)
             outs.append(imp)
-        pd.concat(outs).round(6).to_csv(config.REPORTS / "explain_permutation_demand.csv", index=False)
-        print(f"\nSaved to {config.REPORTS / 'explain_permutation_demand.csv'}")
+        fname = ("explain_permutation_demand_within_product.csv" if args.within_product
+                 else "explain_permutation_demand.csv")
+        pd.concat(outs).round(6).to_csv(config.REPORTS / fname, index=False)
+        print(f"\nSaved to {config.REPORTS / fname}")
     else:
         elig = data.load_eligible_products()
         df = cost_data.load_cost_lines(products=elig.index)

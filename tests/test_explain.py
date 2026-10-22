@@ -119,3 +119,61 @@ def test_cost_importance_catboost_path_passes_categoricals_as_strings():
     assert not pd.api.types.is_numeric_dtype(seen["dtype"])
     assert seen["cols"] == list(cost_data.FEATURES) + [explain.NOISE]
     assert (imp["importance"].abs() < 1e-9).all()
+
+
+def test_permuted_order_is_a_permutation_and_stays_inside_groups():
+    groups = np.repeat(np.arange(5), 20)
+    gidx = explain.group_indices(groups)
+    order = explain.permuted_order(100, gidx, np.random.default_rng(0))
+    assert sorted(order) == list(range(100))
+    for ix in gidx:
+        assert set(order[ix]) == set(ix)
+    assert (order != np.arange(100)).any()                       # something was actually shuffled
+    free = explain.permuted_order(100, None, np.random.default_rng(0))
+    assert sorted(free) == list(range(100)) and any(free[ix].max() > ix.max() or free[ix].min() < ix.min()
+                                                    for ix in gidx)
+
+
+def test_global_shuffle_matches_the_plain_value_shuffle_used_before():
+    v = np.arange(50) * 1.5
+    a = v[explain.permuted_order(50, None, np.random.default_rng(3))]
+    b = np.random.default_rng(3).permutation(v)
+    assert np.allclose(a, b)
+
+
+def test_within_group_shuffle_keeps_group_level_information_and_finds_within_group_signal():
+    rng = np.random.default_rng(0)
+    g = np.repeat(np.arange(10), 60)
+    level = (g * 10.0)                                           # group-level feature (constant inside a group)
+    x = rng.normal(size=len(g))                                  # within-group feature
+    X = pd.DataFrame({"level": level, "x": x, explain.NOISE: rng.normal(size=len(g))})
+    y = level + 2 * x
+    weeks = np.tile(np.arange(60), 10)
+    f = lambda d: d["level"].to_numpy() + 2 * d["x"].to_numpy()
+    glob = explain.permutation_importance(f, X, y, weeks, explain.abs_loss, n_repeats=5, n_boot=100,
+                                          seed=0).set_index("feature")
+    within = explain.permutation_importance(f, X, y, weeks, explain.abs_loss, n_repeats=5, n_boot=100,
+                                            seed=0, groups=g).set_index("feature")
+    assert glob.loc["level", "importance"] > 10                  # shuffling across groups destroys the level
+    assert abs(within.loc["level", "importance"]) < 1e-9         # ...but not within groups
+    assert within.loc["x", "importance"] > 0.5 and within.loc["x", "ci_low"] > 0
+    flagged = explain.flag_informative(within.reset_index()).set_index("feature")
+    assert bool(flagged.loc["x", "above_noise"]) is True and bool(flagged.loc["level", "above_noise"]) is False
+
+
+def test_groups_length_mismatch_raises():
+    X, y, weeks = signal_data(100)
+    try:
+        explain.permutation_importance(lambda d: d["x0"].to_numpy(), X, y, weeks, explain.abs_loss,
+                                       groups=np.arange(99))
+    except ValueError:
+        return
+    raise AssertionError("expected ValueError")
+
+
+def test_demand_within_product_scheme_gives_zero_importance_to_product_level_features():
+    f = make_feat()
+    imp = run_explain.demand_importance(f, "random_forest", n_repeats=3, n_boot=50, within_product=True)
+    imp = imp.set_index("feature")
+    assert set(imp["scheme"]) == {"within_product"}
+    assert abs(imp.loc["product_code", "importance"]) < 1e-9 and abs(imp.loc["is_tier_a", "importance"]) < 1e-9

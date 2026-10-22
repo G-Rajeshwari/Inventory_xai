@@ -1,0 +1,58 @@
+﻿**********************
+Windows PowerShell transcript start
+Start time: 20261022113347
+Username: LAPTOP-I34UUCN5\Rajeshwari
+RunAs User: LAPTOP-I34UUCN5\Rajeshwari
+Configuration Name: 
+Machine: LAPTOP-I34UUCN5 (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\WINDOWS\system32\WindowsPowerShell\v1.0\PowerShell.exe
+Process ID: 14568
+PSVersion: 5.1.26100.9711
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.26100.9711
+BuildVersion: 10.0.26100.9711
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+Transcript started, output file is reports\recheck_log.txt
+PS C:\Users\Rajeshwari\Documents\inventory_xai>
+(.venv) python -m pytest -q
+
+PS C:\Users\Rajeshwari\Documents\inventory_xai>
+(.venv) python -m src.run_baselines
+
+PS C:\Users\Rajeshwari\Documents\inventory_xai>
+(.venv) python -m src.run_demand_models --models random_forest xgboost tabpfn --seeds 0 1 2 3 4
+
+PS C:\Users\Rajeshwari\Documents\inventory_xai>
+(.venv) python -m src.run_ablation --models random_forest xgboost tabpfn
+
+PS C:\Users\Rajeshwari\Documents\inventory_xai>
+(.venv) python -m src.run_tabpfn_cat
+
+PS C:\Users\Rajeshwari\Documents\inventory_xai>
+(.venv) python -m src.probe_cost
+
+PS C:\Users\Rajeshwari\Documents\inventory_xai>
+(.venv) python -m src.run_cost_models
+
+PS C:\Users\Rajeshwari\Documents\inventory_xai>
+(.venv) python -m src.run_optimizer
+
+PS C:\Users\Rajeshwari\Documents\inventory_xai>
+(.venv) python -m src.run_explain --task demand
+
+PS C:\Users\Rajeshwari\Documents\inventory_xai>
+(.venv) python -m src.run_explain --task cost
+
+PS C:\Users\Rajeshwari\Documents\inventory_xai>
+(.venv) python -m src.run_explain --task demand --within-product
+
+PS C:\Users\Rajeshwari\Documents\inventory_xai>
+(.venv) Stop-Transcript
+**********************
+Windows PowerShell transcript end
+End time: 20261022113609
+**********************
