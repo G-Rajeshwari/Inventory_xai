@@ -382,3 +382,30 @@ Expectation stated beforehand: if features carry only level information, no feat
 above noise within product; an above-noise lag or rolling-mean feature would indicate some
 within-product signal that the models use (not necessarily beneficially, since no model beat
 the training mean).
+
+## 25. Stage 8a outcome: within-product permutation importance (VALIDATION rows)
+
+Global tables (shuffling across rows) reproduced exactly on a clean re-run. Within-product
+scheme (rule fixed in Section 24): no feature is above the noise control in Random Forest or
+XGBoost. Random Forest: all intervals include zero (largest: lag_4 +0.089 MAE, model MAE 7.5;
+noise +0.043 [-0.041, 0.121]). XGBoost: roll_mean_4 +0.126 [0.024, 0.233] clears zero but not
+the noise upper bound (0.161); 1 of 18 non-degenerate intervals, consistent with chance.
+product_code and is_tier_a are exactly 0 by construction. The prior expectation (features carry
+only product-level information) was not contradicted. Limit: 21 validation weeks; detectable
+effects are of the order of 0.1 to 0.2 MAE units.
+
+## 26. Stage 8b: SHAP rules (fixed before running)
+
+- Models retrained as in Section 23 (seed 0, defaults, noise column). Demand: XGBoost (all
+  validation rows) and Random Forest (at most 300 rows sampled with a fixed seed). Cost: CatBoost
+  and XGBoost (all validation lines).
+- Validity check: SHAP values + base value must reproduce the model's raw prediction within
+  1e-3 x mean |prediction|; otherwise the results are discarded.
+- Global: mean |SHAP| with a 95% week-bootstrap interval; also the mean absolute deviation of a
+  feature's SHAP value from its product average (variation not explained by product level). A
+  feature is "above noise" only if its interval lower bound exceeds the noise column's upper bound.
+- Expectation stated beforehand: the global measure will be dominated by level-encoding features;
+  within-product, most history features will not clearly exceed the noise column. Any that do
+  reflect reliance by the model, not skill, because no model beat the training mean.
+- Local explanations (largest-error row and median-error row per model) describe how a model built
+  one prediction. They are not causal and do not show what would happen if an input changed.
